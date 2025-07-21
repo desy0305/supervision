@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  supervision:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: supervision-app
+    volumes:
+      # Mount current directory for development
+      - .:/app
+      # Mount a data directory for input/output files
+      - ./data:/app/data
+      # Mount examples directory
+      - ./examples:/app/examples
+    ports:
+      # Expose port for potential web applications or Jupyter notebooks
+      - "8000:8000"
+      - "8888:8888"
+    environment:
+      - PYTHONPATH=/app
+    # Keep container running for interactive use
+    stdin_open: true
+    tty: true
+    # Override default command for development
+    command: /bin/bash
+
+  # Service for running examples
+  supervision-examples:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: supervision-examples
+    volumes:
+      - .:/app
+      - ./data:/app/data
+      - ./examples:/app/examples
+    working_dir: /app/examples
+    environment:
+      - PYTHONPATH=/app
+    stdin_open: true
+    tty: true
+    command: /bin/bash
+
+  # Service for development with additional dev dependencies
+  supervision-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: supervision-dev
+    volumes:
+      - .:/app
+      - ./data:/app/data
+    ports:
+      - "8000:8000"
+      - "8888:8888"
+      - "8080:8080"
+    environment:
+      - PYTHONPATH=/app
+    stdin_open: true
+    tty: true
+    command: /bin/bash

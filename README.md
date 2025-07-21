@@ -36,6 +36,22 @@
 
 ## 💻 install
 
+### 🐳 Docker
+
+For a containerized environment with all dependencies pre-installed:
+
+```bash
+# Quick start with Docker
+./docker-setup.sh setup
+./docker-setup.sh run
+
+# Or with Docker Compose
+docker compose up -d supervision
+docker compose exec supervision bash
+```
+
+See [README.Docker.md](README.Docker.md) for complete Docker setup guide.
+
 Pip install the supervision package in a
 [**Python>=3.9**](https://www.python.org/) environment.
 

@@ -1,0 +1,75 @@
+# Development Dockerfile with additional tools and dependencies
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    # OpenCV dependencies
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgomp1 \
+    libglib2.0-0 \
+    libgtk-3-0 \
+    libgl1-mesa-glx \
+    libfontconfig1 \
+    libxrender1 \
+    libxtst6 \
+    libxi6 \
+    libxrandr2 \
+    libasound2 \
+    # Development tools
+    gcc \
+    g++ \
+    make \
+    cmake \
+    # Utilities
+    curl \
+    wget \
+    git \
+    vim \
+    nano \
+    htop \
+    tree \
+    # For video processing
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy project files
+COPY . .
+
+# Install Python dependencies including development dependencies
+RUN pip install --upgrade pip && \
+    pip install -e . && \
+    pip install -e ".[metrics]" && \
+    # Install development dependencies
+    pip install --dependency-groups dev && \
+    pip install --dependency-groups docs && \
+    # Additional useful packages for development
+    pip install jupyter \
+                jupyterlab \
+                ipython \
+                black \
+                flake8 \
+                mypy \
+                pre-commit
+
+# Create a non-root user for security
+RUN useradd --create-home --shell /bin/bash appuser && \
+    chown -R appuser:appuser /app
+USER appuser
+
+# Expose ports for various services
+EXPOSE 8000 8888 8080
+
+# Default command - start a bash shell for development
+CMD ["bash"]
